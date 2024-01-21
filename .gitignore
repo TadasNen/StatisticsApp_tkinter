@@ -1,0 +1,6 @@
+venv/
+.idea/
+__pycache__/
+*.py[cod]
+*$py.class
+/files/Original_csv.csv
