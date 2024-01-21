@@ -3,8 +3,6 @@ import tkinter as tk
 from tkinter import filedialog
 from methods import file_read_df
 from tkinter import messagebox
-import pandas as pd
-from pandasgui import show
 from tkinter import ttk
 
 
@@ -20,7 +18,7 @@ class MainApp(ctk.CTk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for FrameClass in (MainMenuFrame, UploadFileFrame, StatisticsFrame, InfoFrame):
+        for FrameClass in (MainMenuFrame, UploadFileFrame, InfoFrame):
             page_name = FrameClass.__name__
             frame = FrameClass(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -100,38 +98,6 @@ class UploadFileFrame(ctk.CTkFrame):
             error_message = f"Error: {e}"
             messagebox.showerror("Error", error_message)
 
-    def view_general_data(self):
-        try:
-            if self.df is not None:
-                general_data_window = tk.Toplevel(self.controller)
-                general_data_window.title("General Data")
-
-                tree = self.tree
-
-                for col_idx, col in enumerate(self.df.columns):
-                    tree.heading(col_idx, text=col)
-                    tree.column(col_idx, width=100, anchor='center')
-
-                for _, row in self.df.head().iterrows():
-                    row_values = [str(value) for value in row]
-                    tree.insert("", tk.END, values=row_values)
-
-                scrollbar = ttk.Scrollbar(general_data_window, orient="vertical", command=tree.yview)
-                tree.configure(yscroll=scrollbar.set)
-                scrollbar.pack(side="right", fill="y")
-
-                tree.pack(expand=True, fill="both")
-
-            else:
-                messagebox.showinfo("Info", "Dataframe is not available. Please upload a file first.")
-
-        except Exception as e:
-            error_message = f"Error: {e}"
-            messagebox.showerror("Error", error_message)
-
-    def placeholder_method_3(self):
-        print("Placeholder Method 3 - You can implement the functionality here.")
-
     def show_data_structure(self):
         if self.df is not None:
             for item in self.tree.get_children():
@@ -147,31 +113,51 @@ class UploadFileFrame(ctk.CTkFrame):
         else:
             messagebox.showinfo("Info", "Dataframe is not available. Please upload a file first.")
 
+    def view_general_data(self):
+        try:
+            if self.df is not None:
+                general_data_window = GeneralDataWindow(self.controller, self.df)
+                general_data_window.show_general_data_info()
+            else:
+                messagebox.showinfo("Info", "Dataframe is not available. Please upload a file first.")
+        except Exception as e:
+            error_message = f"Error: {e}"
+            messagebox.showerror("Error", error_message)
 
-class StatisticsFrame(ctk.CTkFrame):
-    def __init__(self, parent, controller):
-        ctk.CTkFrame.__init__(self, parent)
-        self.controller = controller
-        self.statistics_text = None
+    def placeholder_method_3(self):
+        pass
 
-        self.button_upload = ctk.CTkButton(self, text="Upload your file",
-                                           font=('Arial', 18),
-                                           width=200, height=40,
-                                           command=self.upload_file)
-        self.button_upload.pack(padx=10, pady=5)
 
-        self.stats_label = ctk.CTkLabel(self, text="", font=('Arial', 14))
-        self.stats_label.pack(padx=10, pady=5)
+class GeneralDataWindow(ctk.CTkToplevel):
+    def __init__(self, parent, df):
+        super().__init__()
+        self.parent = parent
+        self.df = df
+        self.title("General Data")
+        self.geometry("800x800")
 
-    def upload_file(self):
-        file_path = filedialog.askopenfilename()
-        df = file_read_df(file_path)
-        self.statistics_text = str(df.describe())
-        self.show_statistics()
+        self.tree = ttk.Treeview(self)
+        self.tree["columns"] = ("Index", "Column Names", "Unique Values", "Null Values")
+        self.tree.heading("Index", text="Index")
+        self.tree.heading("Column Names", text="Column Names")
+        self.tree.heading("Unique Values", text="Unique Values")
+        self.tree.heading("Null Values", text="Null Values")
+        self.tree.column("Index", width=50)
+        self.tree.column("Column Names", width=200)
+        self.tree.column("Unique Values", width=200)
+        self.tree.column("Null Values", width=200)
 
-    def show_statistics(self):
-        if self.statistics_text:
-            self.stats_label.config(text=self.statistics_text)
+    def show_general_data_info(self):
+        if self.df is not None:
+            for item in self.tree.get_children():
+                self.tree.delete(item)
+            for idx, col in enumerate(self.df.columns):
+                unique_values_count = self.df[col].nunique()
+                null_values_count = self.df[col].isnull().sum()
+                self.tree.insert("", idx, values=(idx, col, unique_values_count, null_values_count))
+            self.tree.pack(expand=True, fill="both")
+        else:
+            messagebox.showinfo("Info", "Dataframe is not available. Please upload a file first.")
 
 
 class InfoFrame(ctk.CTkFrame):
@@ -188,17 +174,6 @@ class InfoFrame(ctk.CTkFrame):
 
         self.stats_label = ctk.CTkLabel(self, text="", font=('Arial', 14))
         self.stats_label.pack(padx=10, pady=5)
-
-
-class GeneralDataWindow(ctk.CTkToplevel):
-    def __init__(self, parent, df):
-        super().__init__()
-        self.parent = parent
-        self.df = df
-        self.title("General Data")
-        self.geometry("800x600")
-
-        self.gui = show(self.df, width=800, height=600)
 
 
 if __name__ == "__main__":
