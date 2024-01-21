@@ -1,9 +1,7 @@
 import customtkinter as ctk
 import tkinter as tk
-from tkinter import filedialog
-from methods import file_read_df
-from tkinter import messagebox
-from tkinter import ttk
+from tkinter import filedialog, messagebox, ttk
+from methods import file_read_df, update_column_names, save_dataframe_to_excel, remove_columns
 
 
 class MainApp(ctk.CTk):
@@ -75,11 +73,11 @@ class UploadFileFrame(ctk.CTkFrame):
                                          command=self.view_general_data)
         button_view_data.pack(padx=10, pady=5)
 
-        button_placeholder_3 = ctk.CTkButton(self, text="Placeholder Button 3",
+        button_clean_data = ctk.CTkButton(self, text="Clean data",
                                              font=('Arial', 18),
                                              width=200, height=40,
-                                             command=self.placeholder_method_3)
-        button_placeholder_3.pack(padx=10, pady=5)
+                                             command=self.clean_data)
+        button_clean_data.pack(padx=10, pady=5)
 
         button_back = ctk.CTkButton(self, text="Back",
                                     font=('Arial', 18),
@@ -124,8 +122,17 @@ class UploadFileFrame(ctk.CTkFrame):
             error_message = f"Error: {e}"
             messagebox.showerror("Error", error_message)
 
-    def placeholder_method_3(self):
-        pass
+    def clean_data(self):
+        try:
+            if self.df is not None:
+                updated_df = remove_columns(self.df)
+                save_dataframe_to_excel(updated_df)
+            else:
+                messagebox.showinfo("Info", "Dataframe is not available. Please upload a file first.")
+
+        except Exception as e:
+            error_message = f"Error: {e}"
+            messagebox.showerror("Error", error_message)
 
 
 class GeneralDataWindow(ctk.CTkToplevel):
