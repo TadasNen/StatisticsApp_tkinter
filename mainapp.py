@@ -1,7 +1,8 @@
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
-from methods import file_read_df, update_column_names, save_dataframe_to_excel, remove_columns
+from methods import (file_read_df, save_dataframe_to_excel, remove_columns, distance, process_values, split_datetime,
+                     card_type_assign, update_column_names)
 
 
 class MainApp(ctk.CTk):
@@ -74,9 +75,9 @@ class UploadFileFrame(ctk.CTkFrame):
         button_view_data.pack(padx=10, pady=5)
 
         button_clean_data = ctk.CTkButton(self, text="Clean data",
-                                             font=('Arial', 18),
-                                             width=200, height=40,
-                                             command=self.clean_data)
+                                          font=('Arial', 18),
+                                          width=200, height=40,
+                                          command=self.clean_data)
         button_clean_data.pack(padx=10, pady=5)
 
         button_back = ctk.CTkButton(self, text="Back",
@@ -126,6 +127,11 @@ class UploadFileFrame(ctk.CTkFrame):
         try:
             if self.df is not None:
                 updated_df = remove_columns(self.df)
+                updated_df = distance(updated_df)
+                updated_df = process_values(updated_df)
+                updated_df = split_datetime(updated_df)
+                updated_df = card_type_assign(updated_df)
+                updated_df = update_column_names(updated_df)
                 save_dataframe_to_excel(updated_df)
             else:
                 messagebox.showinfo("Info", "Dataframe is not available. Please upload a file first.")

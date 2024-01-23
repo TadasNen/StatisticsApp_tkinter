@@ -5,3 +5,4 @@ Odfpy
 Xlrd
 Openpyxl
 Xlsxwriter
+Requests
