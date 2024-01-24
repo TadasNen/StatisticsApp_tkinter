@@ -64,39 +64,18 @@ def update_column_names(df):
     Returns:
     - pd.DataFrame: The DataFrame with updated column names.
     """
-    column_names = {'cc_num': 'Card Number', 'merchant': 'Store', 'category': 'Store Industry', 'amt': 'Amount, EUR',
-                    'gender': 'Gender', 'job': 'Job', 'dob': 'Date of Birth', 'is_fraud': 'Fraud'}
+
+    # Variable with all column names and their new name counterparts
+    column_names = {'trans_date_trans_time': 'Date and Time', 'cc_num': 'Card Number', 'merchant': 'Store',
+                    'category': 'Store Industry', 'amt': 'Amount, EUR', 'first': 'First name', 'last': 'Last name',
+                    'gender': 'Gender', 'street': 'Address', 'city': 'City', 'zip': 'ZIP code',
+                    'lat': 'Latitude Person',
+                    'long': 'Longitude Preson', 'city_pop': 'City population', 'job': 'Job', 'dob': 'Date of Birth',
+                    'trans_num': 'Transaction ID', 'unix_time': 'Unix time', 'merch_lat': 'Latitude Store',
+                    'merch_long': 'Longitude Store', 'is_fraud': 'Fraud'}
+    # Updates existing columns, if there aren't matching names, it will skip
     updated_df = df.rename(columns=column_names)
     return updated_df
-
-
-def save_dataframe_to_excel(df, chunk_size=1000):
-    """
-    Saves and updated DataFrame to an Excel file in chunks and prompts the user for the save location.
-
-    Parameters:
-    - df (pd.DataFrame): The DataFrame to be saved.
-    - chunk_size (int): The number of rows to save in each chunk. Default is 1000. Used to reduce time of saving files
-    that have large quantity of rows
-    """
-    try:
-        # Prompt user for save location
-        save_path = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx")])
-        if save_path:
-            # Create ExcelWriter
-            with pd.ExcelWriter(save_path, engine='xlsxwriter') as writer:
-                # Save the DataFrame to .xlsx file in chunks
-                for i in range(0, len(df), chunk_size):
-                    chunk = df.iloc[i:i + chunk_size]
-                    # Check if it's the first chunk and make column names row
-                    if i == 0:
-                        chunk.to_excel(writer, index=False, sheet_name='Sheet1')
-                    else:
-                        chunk.to_excel(writer, index=False, sheet_name='Sheet1', header=False, startrow=i)
-
-            messagebox.showinfo("Info", "Dataframe saved as .xlsx successfully.")
-    except Exception as e:
-        raise e
 
 
 def distance(df):
@@ -275,6 +254,35 @@ def card_type_assign(df):
         cache.clear()
 
     return df
+
+
+def save_dataframe_to_excel(df, chunk_size=1000):
+    """
+    Saves and updated DataFrame to an Excel file in chunks and prompts the user for the save location.
+
+    Parameters:
+    - df (pd.DataFrame): The DataFrame to be saved.
+    - chunk_size (int): The number of rows to save in each chunk. Default is 1000. Used to reduce time of saving files
+    that have large quantity of rows
+    """
+    try:
+        # Prompt user for save location
+        save_path = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx")])
+        if save_path:
+            # Create ExcelWriter
+            with pd.ExcelWriter(save_path, engine='xlsxwriter') as writer:
+                # Save the DataFrame to .xlsx file in chunks
+                for i in range(0, len(df), chunk_size):
+                    chunk = df.iloc[i:i + chunk_size]
+                    # Check if it's the first chunk and make column names row
+                    if i == 0:
+                        chunk.to_excel(writer, index=False, sheet_name='Sheet1')
+                    else:
+                        chunk.to_excel(writer, index=False, sheet_name='Sheet1', header=False, startrow=i)
+
+            messagebox.showinfo("Info", "Dataframe saved as .xlsx successfully.")
+    except Exception as e:
+        raise e
 
 # def clean_data(df):
 #     updated_df =
