@@ -1,9 +1,9 @@
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
-
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import pandas as pd
-
 from methods import (file_read_df, save_dataframe_to_excel, remove_columns, distance, process_values, split_datetime,
                      card_type_assign, update_column_names)
 
@@ -20,7 +20,7 @@ class MainApp(ctk.CTk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for FrameClass in (MainMenuFrame, UploadFileFrame, InfoFrame, StatisticsFrame):
+        for FrameClass in (MainMenuFrame, UploadFileFrame, InfoFrame):
             page_name = FrameClass.__name__
             frame = FrameClass(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -145,12 +145,7 @@ class UploadFileFrame(ctk.CTkFrame):
     def open_statistics(self):
         try:
             if self.df is not None:
-                frame_name = "StatisticsFrame"
-                if frame_name not in self.controller.frames:
-                    statistics_frame = StatisticsFrame(self.controller, self.df)
-                    self.controller.frames[frame_name] = statistics_frame
-                    statistics_frame.grid(row=0, column=0, sticky="nsew")
-                self.controller.show_frame(frame_name)
+                StatisticsWindow(self.controller, self.df)
             else:
                 messagebox.showinfo("Info", "Dataframe is not available. Please upload a file first.")
         except Exception as e:
@@ -270,17 +265,47 @@ class CleanDataWindow(ctk.CTkToplevel):
             messagebox.showerror(error_message)
 
 
-class StatisticsFrame(ctk.CTkFrame):
-    def __init__(self, parent, controller):
-        ctk.CTkFrame.__init__(self, parent)
-        self.controller = controller
+class StatisticsWindow(ctk.CTkToplevel):
+    def __init__(self, parent, df):
+        super().__init__()
+        self.title('Statistics')
+        self.geometry("600x800")
+        self.df = df
+        self.parent = parent
 
-        button_back = ctk.CTkButton(self, text="Back",
-                                    font=('Arial', 18),
-                                    width=200, height=40,
-                                    command=lambda: controller.show_frame("UploadFileFrame"))
-        button_back.pack(padx=10, pady=20)
+        button_open_gender = ctk.CTkButton(self, text="Open Pie Chart", command=self.open_gender_pie_chart)
+        button_open_gender.pack(pady=10)
 
+    def open_gender_pie_chart(self):
+        pie_chart_window = GenderPieChartWindow(self, self.df)
+        pie_chart_window.mainloop()
+
+
+class GenderPieChartWindow(ctk.CTkToplevel):
+    def __init__(self, parent, df):
+        super().__init__(parent)
+        self.title("Gender Pie Chart")
+        self.geometry("800x600")
+
+        gender_counts = df['gender'].value_counts()
+        labels = gender_counts.index
+        sizes = gender_counts.values
+
+        fig, ax = plt.subplots()
+        ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=1)
+        ax.axis('equal')
+        canvas = FigureCanvasTkAgg(fig, master=self)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        button_save = ctk.CTkButton(self, text="Save as PNG", command=self.save_as_png)
+        button_save.pack(pady=10)
+
+    def save_as_png(self):
+        file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png")])
+        if file_path:
+            plt.savefig(file_path, format="png")
+            messagebox.showinfo("Info", "Pie chart saved as .png")
 
 
 class InfoFrame(ctk.CTkFrame):
