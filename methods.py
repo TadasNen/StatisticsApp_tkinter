@@ -1,10 +1,4 @@
 from geopy.distance import geodesic
-import requests
-import json
-
-
-
-
 
 def remove_columns(df):
     """
@@ -225,10 +219,6 @@ def card_type_assign(df):
         cache.clear()
 
     return df
-
-
-
-
 
 # def update_cc_info(df):
 #     api_url = "https://api.freebinchecker.com/bin/{bin}"

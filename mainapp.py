@@ -1,9 +1,8 @@
 import customtkinter as ctk
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import messagebox, ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import pandas as pd
 from methods import (remove_columns, distance, process_values, split_datetime,
                      card_type_assign, update_column_names)
 from methods_file_handling import file_read_df, df_save_to_excel, save_as_png
@@ -213,7 +212,7 @@ class CleanDataWindow(ctk.CTkToplevel):
                                            variable=self.cb_distance_var)
 
         self.cb_process_values_var = ctk.BooleanVar()
-        self.cb_process_values = ctk.CTkCheckBox(self, text='Adjust value of merchants',
+        self.cb_process_values = ctk.CTkCheckBox(self, text='Adjust values',
                                                  variable=self.cb_process_values_var)
 
         self.cb_split_datetime_var = ctk.BooleanVar()
@@ -315,8 +314,18 @@ class InfoFrame(ctk.CTkFrame):
                                     command=lambda: controller.show_frame("MainMenuFrame"))
         button_back.pack(padx=10, pady=20)
 
-        self.stats_label = ctk.CTkLabel(self, text="", font=('Arial', 14))
+        self.stats_label = ctk.CTkLabel(self, text="", font=('Arial', 14), anchor='w', justify="left")
         self.stats_label.pack(padx=10, pady=5)
+        readme_file_path = "README.txt"  # Update the path accordingly
+        readme_content = self.load_readme_content(readme_file_path)
+        self.stats_label.configure(text=readme_content)
+
+    def load_readme_content(self, file_path):
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                return file.read()
+        except Exception as e:
+            return f"Error loading README: {e}"
 
 
 if __name__ == "__main__":
