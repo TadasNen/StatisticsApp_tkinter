@@ -1,38 +1,9 @@
-import pandas as pd
-from tkinter import messagebox, filedialog
 from geopy.distance import geodesic
 import requests
 import json
 
 
-def file_read_df(file_path):
-    """
-    Reads a file user uploaded and returns a DataFrame.
 
-    Parameters:
-    - file_path (str): The path to the file.
-
-    Returns:
-    - pd.DataFrame: The DataFrame created from the file.
-    """
-    try:
-        if file_path.endswith(".csv"):
-            df = pd.read_csv(file_path)
-        elif file_path.endswith(".ods"):
-            df = pd.read_excel(file_path, engine='odf')
-        elif file_path.endswith(".xls"):
-            df = pd.read_excel(file_path, engine='xlrd')
-        elif file_path.endswith(".xlsx"):
-            df = pd.read_excel(file_path)
-        else:
-            raise ValueError("File is not supported by the program")
-        df = df.astype(str)
-
-        return df
-    except Exception as e:
-        error_message = f"Error: {e}"
-        messagebox.showerror("Error", error_message)
-        return None
 
 
 def remove_columns(df):
@@ -256,36 +227,7 @@ def card_type_assign(df):
     return df
 
 
-def save_dataframe_to_excel(df, chunk_size=1000):
-    """
-    Saves and updated DataFrame to an Excel file in chunks and prompts the user for the save location.
 
-    Parameters:
-    - df (pd.DataFrame): The DataFrame to be saved.
-    - chunk_size (int): The number of rows to save in each chunk. Default is 1000. Used to reduce time of saving files
-    that have large quantity of rows
-    """
-    try:
-        # Prompt user for save location
-        save_path = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx")])
-        if save_path:
-            # Create ExcelWriter
-            with pd.ExcelWriter(save_path, engine='xlsxwriter') as writer:
-                # Save the DataFrame to .xlsx file in chunks
-                for i in range(0, len(df), chunk_size):
-                    chunk = df.iloc[i:i + chunk_size]
-                    # Check if it's the first chunk and make column names row
-                    if i == 0:
-                        chunk.to_excel(writer, index=False, sheet_name='Sheet1')
-                    else:
-                        chunk.to_excel(writer, index=False, sheet_name='Sheet1', header=False, startrow=i)
-
-            messagebox.showinfo("Info", "Dataframe saved as .xlsx successfully.")
-    except Exception as e:
-        raise e
-
-# def clean_data(df):
-#     updated_df =
 
 
 # def update_cc_info(df):

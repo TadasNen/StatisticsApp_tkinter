@@ -4,12 +4,17 @@ from tkinter import filedialog, messagebox, ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import pandas as pd
-from methods import (file_read_df, save_dataframe_to_excel, remove_columns, distance, process_values, split_datetime,
+from methods import (remove_columns, distance, process_values, split_datetime,
                      card_type_assign, update_column_names)
+from methods_file_handling import file_read_df, df_save_to_excel, save_as_png
 
 
 class MainApp(ctk.CTk):
+    """
+    Initiation of program, default GUI settings and frame handling.
+    """
     def __init__(self, *args, **kwargs):
+        # Frame format template and variables to transfer inforamtion to specific frames
         ctk.CTk.__init__(self, *args, **kwargs)
         self.title('Excel viewer')
         self.title_font = ctk.CTkFont(family='Arial', size=18, weight="bold", slant="italic")
@@ -19,6 +24,7 @@ class MainApp(ctk.CTk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
+        # Frame list and their settings
         self.frames = {}
         for FrameClass in (MainMenuFrame, UploadFileFrame, InfoFrame):
             page_name = FrameClass.__name__
@@ -26,6 +32,7 @@ class MainApp(ctk.CTk):
             self.frames[page_name] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
+        # Calls MainMenuFrame as a default view when program is initialized from methods_GUI file
         self.show_frame("MainMenuFrame")
 
     def show_frame(self, page_name):
@@ -98,13 +105,7 @@ class UploadFileFrame(ctk.CTkFrame):
         self.infobox = ctk.CTkTextbox(self)
 
     def upload_file(self):
-        file_path = filedialog.askopenfilename()
-        try:
-            self.df = file_read_df(file_path)
-            self.show_data_structure()
-        except Exception as e:
-            error_message = f"Error: {e}"
-            messagebox.showerror("Error", error_message)
+        self.df = file_read_df()
 
     def show_data_structure(self):
         if self.df is not None:
@@ -259,7 +260,7 @@ class CleanDataWindow(ctk.CTkToplevel):
                     df = card_type_assign(df)
                 if self.cb_update_columns_var.get():
                     df = update_column_names(df)
-                save_dataframe_to_excel(df)
+                df_save_to_excel(df)
         except Exception as e:
             error_message = f'Error: {e}'
             messagebox.showerror(error_message)
@@ -298,14 +299,8 @@ class GenderPieChartWindow(ctk.CTkToplevel):
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-        button_save = ctk.CTkButton(self, text="Save as PNG", command=self.save_as_png)
+        button_save = ctk.CTkButton(self, text="Save as PNG", command=save_as_png)
         button_save.pack(pady=10)
-
-    def save_as_png(self):
-        file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png")])
-        if file_path:
-            plt.savefig(file_path, format="png")
-            messagebox.showinfo("Info", "Pie chart saved as .png")
 
 
 class InfoFrame(ctk.CTkFrame):
