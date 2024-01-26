@@ -355,9 +355,13 @@ class StatisticsWindow(ctk.CTkToplevel):
         """
         super().__init__()
         self.title('Statistics')
-        self.geometry("600x800")
+        self.geometry("500x300")
         self.df = df
         self.parent = parent
+
+        # Label for statistics window
+        self.label = ctk.CTkLabel(self, text='Select which chart should be opened')
+        self.label.pack(padx=20, pady=20)
 
         # Button to open the Gender Pie Chart
         button_open_gender = ctk.CTkButton(self, text="Open Pie Chart", command=self.open_gender_pie_chart)
@@ -368,7 +372,8 @@ class StatisticsWindow(ctk.CTkToplevel):
         Opens a Gender Pie Chart window.
         """
         pie_chart_window = GenderPieChartWindow(self, self.df)
-        pie_chart_window.mainloop()
+        pie_chart_window.grab_set()
+        self.wait_window(pie_chart_window)
 
 
 class GenderPieChartWindow(ctk.CTkToplevel):
