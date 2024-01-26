@@ -7,6 +7,7 @@ on creating reports for management. Although, the dataset used is not one that i
 app allows minor modifications to be adaptable to required dataset template.
 
 The dataset used was acquired from https://www.kaggle.com/datasets/dermisfit/fraud-transactions-dataset
+To launch the app run 'main.py' file
 
 App functions:
 - View of general data:
