@@ -4,7 +4,7 @@ from tkinter import messagebox, ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from methods_data_formatting import process_functions
-from methods_file_handling import file_read_df, save_as_png
+from methods_file_handling import file_read_df, save_as_png, load_readme_content
 from methods_general_data import show_general_data_info, show_data_structure
 
 
@@ -121,6 +121,10 @@ class UploadFileFrame(ctk.CTkFrame):
         ctk.CTkFrame.__init__(self, parent)
         self.controller = controller
         self.df = None
+
+        # Title label
+        label = ctk.CTkLabel(self, text="FILE HANDLING OPTIONS", font=controller.title_font)
+        label.pack(side="top", fill="x", pady=10)
 
         # Treeview widget for displaying data structure
         self.tree = ttk.Treeview(self)
@@ -312,8 +316,6 @@ class CleanDataWindow(ctk.CTkToplevel):
 
         # Pack widgets
         self.cb_remove_columns.pack(padx=20, pady=20)
-        self.label2 = ctk.CTkLabel(self, text='Removes columns not relevant for data')
-        self.label2.pack(padx=20, pady=5)
         self.cb_update_columns.pack(padx=20, pady=20)
         self.cb_distance.pack(padx=20, pady=20)
         self.cb_process_values.pack(padx=20, pady=20)
@@ -435,20 +437,9 @@ class InfoFrame(ctk.CTkFrame):
 
         # Load README content from file
         readme_file_path = "README.txt"
-        readme_content = self.load_readme_content(readme_file_path)
+        readme_content = self.display_readme_content(readme_file_path)
         self.stats_label.configure(text=readme_content)
 
-    def load_readme_content(self, file_path):
-        """
-        Load README content from a file.
-
-        Parameters:
-        - file_path: The path to the README file.
-
-        :return: The content of the README file as a string.
-        """
-        try:
-            with open(file_path, "r", encoding="utf-8") as file:
-                return file.read()
-        except Exception as e:
-            return f"Error loading README: {e}"
+    def display_readme_content(self, file_path):
+        # Calls function to read readme.txt file and returns the content
+        return load_readme_content(file_path)

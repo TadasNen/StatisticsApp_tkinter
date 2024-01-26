@@ -89,3 +89,19 @@ def save_as_png():
     if file_path:
         plt.savefig(file_path, format="png")
         messagebox.showinfo("Info", "Pie chart saved as .png")
+
+
+def load_readme_content(file_path):
+    """
+    Load README content from a file.
+
+    Parameters:
+    - file_path: The path to the README file.
+
+    :return: The content of the README file as a string.
+    """
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            return file.read()
+    except Exception as e:
+        return f"Error loading README: {e}"
