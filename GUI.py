@@ -445,6 +445,7 @@ class InfoFrame(ctk.CTkFrame):
         readme_content = self.display_readme_content(readme_file_path)
         self.stats_label.configure(text=readme_content)
 
-    def display_readme_content(self, file_path):
+    @staticmethod
+    def display_readme_content(file_path):
         # Calls function to read readme.txt file and returns the content
         return load_readme_content(file_path)
