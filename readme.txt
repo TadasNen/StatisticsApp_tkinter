@@ -35,6 +35,5 @@ Odfpy
 Xlrd
 Openpyxl
 Xlsxwriter
-Requests (only if using API)
 
 For specific releases read requirements.txt
